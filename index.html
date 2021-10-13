@@ -8,11 +8,35 @@
     <script src="./app.js" defer></script>
     <script src="./glMatrix.js" defer></script>
     <script src="./webgl-debug.js" defer></script>
+
+    <!-- 얘는 렌더링 루프를 사용하기 위해 추가한 라이브러리 -> requestAnimFrame()과 cancelAnimFrame()을 사용함. -->
     <script src="./webgl-utils.js" defer></script>
 
-    <script id="shader-vs" type="x-shader/x-vertex"></script>
+    <script id="shader-vs" type="x-shader/x-vertex">
+      attribute vec3 aVertexPosition;
+      attribute vec2 aTextureCoordinates;
 
-    <script id="shader-fs" type="x-shader/x-fragment"></script>
+      uniform mat4 uMVMatrix;
+      uniform mat4 uPMatrix;
+
+      varying vec2 vTextureCoordinates;
+
+      void main() {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vTextureCoordinates = aTextureCoordinates;
+      }
+    </script>
+
+    <script id="shader-fs" type="x-shader/x-fragment">
+      precision mediump float;
+
+      varying vec2 vTextureCoordinates;
+      uniform sampler2D uSampler;
+
+      void main() {
+        gl_FragColor = texture2D(uSampler, vTextureCoordinates);
+      }
+    </script>
   </head>
   <body onload="startup();">
     <canvas id="myGLCanvas" width="500" height="500"></canvas>
